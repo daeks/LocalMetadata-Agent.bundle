@@ -7,6 +7,24 @@ def Start():
   
 def ValidatePrefs():
   pass
+
+class LocalMetadataAgent(Agent.Movies):
+  name = 'Local Metadata Agent (Movies)'
+  languages = [Locale.Language.NoLanguage]
+  primary_provider = False
+  contributes_to = ['com.plexapp.agents.none', 'com.plexapp.agents.imdb', 'com.plexapp.agents.themoviedb']
+
+  def search(self, results, media, lang, manual=False):
+    if media.primary_agent == 'com.plexapp.agents.none':
+      results.Append(MetadataSearchResult(id = media.id, name = media.name, score = 100))
+    else:
+      results.Append(MetadataSearchResult(id = media.primary_metadata.id, score = 100))
+
+  def update(self, metadata, media, lang):
+    part = media.items[0].parts[0]
+    path = os.path.dirname(part.file)
+    (root_file, ext) = os.path.splitext(os.path.basename(part.file))
+    Log('[METADATA] Searching metadata for %s in %s' % (root_file, path))
     
 class LocalMetadataAgent(Agent.TV_Shows):
   name = 'Local Metadata Agent (TV)'
